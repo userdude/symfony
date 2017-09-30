@@ -32,6 +32,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
+use Symfony\Component\Message\DependencyInjection\MessagePass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
@@ -114,6 +115,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, FormPass::class);
         $container->addCompilerPass(new WorkflowGuardListenerPass());
         $container->addCompilerPass(new ResettableServicePass());
+        $this->addCompilerPassIfExists($container, MessagePass::class);
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);

@@ -22,6 +22,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Message\MessageBusInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -101,6 +102,7 @@ class Configuration implements ConfigurationInterface
         $this->addPhpErrorsSection($rootNode);
         $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode);
+        $this->addMessageSection($rootNode);
 
         return $treeBuilder;
     }
@@ -898,6 +900,37 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('web_link')
                     ->info('web links configuration')
                     ->{!class_exists(FullStack::class) && class_exists(HttpHeaderSerializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addMessageSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('message')
+                    ->info('Message configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->arrayNode('routing')
+                            ->useAttributeAsKey('message_class')
+                            ->prototype('array')
+                                ->beforeNormalization()
+                                    ->ifString()
+                                    ->then(function ($v) {
+                                        return array('producers' => array($v));
+                                    })
+                                ->end()
+                                ->children()
+                                    ->arrayNode('producers')
+                                        ->requiresAtLeastOneElement()
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <!-- Bus -->
+        <service id="message_bus" class="Symfony\Component\Message\MessageBus" public="true">
+            <argument type="collection" /> <!-- Middlewares -->
+        </service>
+
+        <service id="message.middleware.debug.logging" class="Symfony\Component\Message\Debug\LoggingMiddleware">
+            <argument type="service" id="logger" />
+
+            <tag name="message_middleware" priority="10" />
+        </service>
+
+        <!-- Handlers -->
+        <service id="message.handler_resolver" class="Symfony\Component\Message\MessageHandlerResolver">
+            <argument type="collection" /> <!-- Message to handler mapping -->
+        </service>
+
+        <service id="message.middleware.call_message_handler" class="Symfony\Component\Message\Middleware\CallMessageHandlerMiddleware">
+            <argument type="service" id="message.handler_resolver" />
+
+            <tag name="message_middleware" priority="-10" />
+        </service>
+
+        <!-- Asynchronous -->
+        <service id="message.asynchronous.routing.producer_for_message_resolver" class="Symfony\Component\Message\Asynchronous\Routing\ProducerForMessageResolver">
+            <argument type="collection" /> <!-- Message to producer mapping -->
+        </service>
+        <service id="message.asynchronous.middleware.send_message_to_producer" class="Symfony\Component\Message\Asynchronous\Middleware\SendMessageToProducersMiddleware">
+            <argument type="service" id="message.asynchronous.routing.producer_for_message_resolver" />
+
+            <tag name="message_middleware" priority="-5" />
+        </service>
+
+        <!-- Message encoding/decoding -->
+        <service id="message.transport.serialize_message_with_type_in_headers" class="Symfony\Component\Message\Transport\SerializeMessageWithTypeInHeaders">
+            <argument type="service" id="serializer" />
+        </service>
+
+        <service id="message.transport.default_encoder" alias="message.transport.serialize_message_with_type_in_headers" public="true" />
+        <service id="message.transport.default_decoder" alias="message.transport.serialize_message_with_type_in_headers" public="true" />
+    </services>
+</container>

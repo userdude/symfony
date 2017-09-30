@@ -265,6 +265,10 @@ class FrameworkExtension extends Extension
             $this->registerLockConfiguration($config['lock'], $container, $loader);
         }
 
+        if ($this->isConfigEnabled($container, $config['message'])) {
+            $this->registerMessageConfiguration($config['message'], $container, $loader);
+        }
+
         if ($this->isConfigEnabled($container, $config['web_link'])) {
             if (!class_exists(HttpHeaderSerializer::class)) {
                 throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed.');
@@ -1362,6 +1366,20 @@ class FrameworkExtension extends Extension
                 $container->setAlias(LockInterface::class, new Alias('lock', false));
             }
         }
+    }
+
+    private function registerMessageConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('message.xml');
+
+        $messageToProducerMapping = array();
+        foreach ($config['routing'] as $message => $messageConfiguration) {
+            $messageToProducerMapping[$message] = array_map(function (string $serviceName) {
+                return new Reference($serviceName);
+            }, $messageConfiguration['producers']);
+        }
+
+        $container->getDefinition('message.asynchronous.routing.producer_for_message_resolver')->setArgument(0, $messageToProducerMapping);
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

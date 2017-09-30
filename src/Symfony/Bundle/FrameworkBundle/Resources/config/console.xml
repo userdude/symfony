@@ -64,7 +64,11 @@
             <tag name="console.command" command="debug:event-dispatcher" />
         </service>
 
-        <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
+        <service id="Symfony\Bundle\FrameworkBundle\Command\MessageConsumeCommand">
+            <tag name="console.command" command="message:consume" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
             <argument type="service" id="router" />
             <tag name="console.command" command="debug:router" />
         </service>
