@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Message\Asynchronous\ConsumedMessage;
+use Symfony\Component\Message\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Message\MessageBusInterface;
 use Symfony\Component\Message\MessageConsumerInterface;
 
@@ -70,8 +70,8 @@ EOF
         }
 
         foreach ($consumer->consume() as $message) {
-            if (!$message instanceof ConsumedMessage) {
-                $message = new ConsumedMessage($message);
+            if (!$message instanceof ReceivedMessage) {
+                $message = new ReceivedMessage($message);
             }
 
             $messageBus->handle($message);

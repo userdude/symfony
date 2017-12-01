@@ -19,18 +19,18 @@
         </service>
 
         <!-- Handlers -->
-        <service id="message.handler_resolver" class="Symfony\Component\Message\MessageHandlerResolver">
+        <service id="message.handler_resolver" class="Symfony\Component\Message\HandlerLocator">
             <argument type="collection" /> <!-- Message to handler mapping -->
         </service>
 
-        <service id="message.middleware.call_message_handler" class="Symfony\Component\Message\Middleware\CallMessageHandlerMiddleware">
+        <service id="message.middleware.call_message_handler" class="Symfony\Component\Message\Middleware\HandleMessageMiddleware">
             <argument type="service" id="message.handler_resolver" />
 
             <tag name="message_middleware" priority="-10" />
         </service>
 
         <!-- Asynchronous -->
-        <service id="message.asynchronous.routing.producer_for_message_resolver" class="Symfony\Component\Message\Asynchronous\Routing\ProducerForMessageResolver">
+        <service id="message.asynchronous.routing.producer_for_message_resolver" class="Symfony\Component\Message\Asynchronous\Routing\SenderLocator">
             <argument type="collection" /> <!-- Message to producer mapping -->
         </service>
         <service id="message.asynchronous.middleware.send_message_to_producer" class="Symfony\Component\Message\Asynchronous\Middleware\SendMessageToProducersMiddleware">
@@ -40,7 +40,7 @@
         </service>
 
         <!-- Message encoding/decoding -->
-        <service id="message.transport.serialize_message_with_type_in_headers" class="Symfony\Component\Message\Transport\SerializeMessageWithTypeInHeaders">
+        <service id="message.transport.serialize_message_with_type_in_headers" class="Symfony\Component\Message\Transport\SymfonySerialization">
             <argument type="service" id="serializer" />
         </service>
 
