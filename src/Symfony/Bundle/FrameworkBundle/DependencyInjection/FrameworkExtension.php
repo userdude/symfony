@@ -1372,14 +1372,14 @@ class FrameworkExtension extends Extension
     {
         $loader->load('message.xml');
 
-        $messageToProducerMapping = array();
+        $messageToSenderMapping = array();
         foreach ($config['routing'] as $message => $messageConfiguration) {
-            $messageToProducerMapping[$message] = array_map(function (string $serviceName) {
+            $messageToSenderMapping[$message] = array_map(function (string $serviceName) {
                 return new Reference($serviceName);
-            }, $messageConfiguration['producers']);
+            }, $messageConfiguration['senders']);
         }
 
-        $container->getDefinition('message.asynchronous.routing.producer_for_message_resolver')->setArgument(0, $messageToProducerMapping);
+        $container->getDefinition('message.asynchronous.routing.sender_locator')->setArgument(0, $messageToSenderMapping);
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

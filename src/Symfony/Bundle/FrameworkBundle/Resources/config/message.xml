@@ -30,11 +30,11 @@
         </service>
 
         <!-- Asynchronous -->
-        <service id="message.asynchronous.routing.producer_for_message_resolver" class="Symfony\Component\Message\Asynchronous\Routing\SenderLocator">
-            <argument type="collection" /> <!-- Message to producer mapping -->
+        <service id="message.asynchronous.routing.sender_locator" class="Symfony\Component\Message\Asynchronous\Routing\SenderLocator">
+            <argument type="collection" /> <!-- Message to sender mapping -->
         </service>
         <service id="message.asynchronous.middleware.send_message_to_producer" class="Symfony\Component\Message\Asynchronous\Middleware\SendMessageToProducersMiddleware">
-            <argument type="service" id="message.asynchronous.routing.producer_for_message_resolver" />
+            <argument type="service" id="message.asynchronous.routing.sender_locator" />
 
             <tag name="message_middleware" priority="-5" />
         </service>
