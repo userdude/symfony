@@ -33,7 +33,7 @@
         <service id="message.asynchronous.routing.sender_locator" class="Symfony\Component\Message\Asynchronous\Routing\SenderLocator">
             <argument type="collection" /> <!-- Message to sender mapping -->
         </service>
-        <service id="message.asynchronous.middleware.send_message_to_producer" class="Symfony\Component\Message\Asynchronous\Middleware\SendMessageToProducersMiddleware">
+        <service id="message.asynchronous.middleware.send_message_to_producer" class="Symfony\Component\Message\Asynchronous\Middleware\SendMessageMiddleware">
             <argument type="service" id="message.asynchronous.routing.sender_locator" />
 
             <tag name="message_middleware" priority="-5" />
