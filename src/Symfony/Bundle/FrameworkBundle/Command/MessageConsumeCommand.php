@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Message\Asynchronous\Transport\ReceivedMessage;
 use Symfony\Component\Message\MessageBusInterface;
-use Symfony\Component\Message\MessageConsumerInterface;
+use Symfony\Component\Message\Transport\ReceiverInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -35,7 +35,7 @@ class MessageConsumeCommand extends Command
     {
         $this
             ->setDefinition(array(
-                new InputArgument('consumer', InputArgument::REQUIRED, 'Name of the consumer'),
+                new InputArgument('receiver', InputArgument::REQUIRED, 'Name of the receiver'),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to dispatch the messages to', 'message_bus'),
             ))
             ->setDescription('Consume a message')
@@ -57,10 +57,10 @@ EOF
         /** @var ContainerInterface $container */
         $container = $this->getApplication()->getKernel()->getContainer();
 
-        if (!$container->has($consumerName = $input->getArgument('consumer'))) {
-            throw new \RuntimeException(sprintf('Consumer "%s" do not exists', $consumerName));
-        } elseif (!($consumer = $container->get($consumerName)) instanceof MessageConsumerInterface) {
-            throw new \RuntimeException(sprintf('Consumer "%s" is not a valid message consumer. It should implement the interface "%s"', $consumerName, MessageConsumerInterface::class));
+        if (!$container->has($receiverName = $input->getArgument('receiver'))) {
+            throw new \RuntimeException(sprintf('Receiver "%s" do not exists', $receiverName));
+        } elseif (!($receiver = $container->get($receiverName)) instanceof ReceiverInterface) {
+            throw new \RuntimeException(sprintf('Receiver "%s" is not a valid message consumer. It should implement the interface "%s"', $receiverName, ReceiverInterface::class));
         }
 
         if (!$container->has($busName = $input->getOption('bus'))) {
@@ -69,7 +69,7 @@ EOF
             throw new \RuntimeException(sprintf('Bus "%s" is not a valid message bus. It should implement the interface "%s"', $busName, MessageBusInterface::class));
         }
 
-        foreach ($consumer->consume() as $message) {
+        foreach ($receiver->receive() as $message) {
             if (!$message instanceof ReceivedMessage) {
                 $message = new ReceivedMessage($message);
             }
