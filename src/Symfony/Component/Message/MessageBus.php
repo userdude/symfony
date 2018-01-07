@@ -47,7 +47,7 @@ class MessageBus implements MessageBusInterface
         $middleware = $this->middlewares[$index];
 
         return function ($message) use ($middleware, $index) {
-            $middleware->handle($message, $this->callableForNextMiddleware($index + 1));
+            return $middleware->handle($message, $this->callableForNextMiddleware($index + 1));
         };
     }
 }
