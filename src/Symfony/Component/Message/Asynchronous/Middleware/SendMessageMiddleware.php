@@ -39,7 +39,7 @@ class SendMessageMiddleware implements MiddlewareInterface
                 $sender->send($message);
             }
 
-            if (!in_array(null, $senders)) {
+            if (!in_array(null, $senders, true)) {
                 return;
             }
         }
